@@ -11,12 +11,12 @@ public class TickTickServerApplication {
 
 	public static void main(String[] args) {
 		// ✅ Decode base64 keystore before starting Spring Boot
-		initKeystoreFromEnv();
+		//initKeystoreFromEnv();
 
 		SpringApplication.run(TickTickServerApplication.class, args);
 	}
 
-	private static void initKeystoreFromEnv() {
+	/*private static void initKeystoreFromEnv() {
 		try {
 			String base64 = System.getenv("KEYSTORE_B64");
 			if (base64 == null || base64.isEmpty()) {
@@ -34,5 +34,5 @@ public class TickTickServerApplication {
 			e.printStackTrace();
 			System.exit(1); // Ngăn app khởi động nếu lỗi
 		}
-	}
+	}*/
 }
