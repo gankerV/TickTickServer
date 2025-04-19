@@ -82,7 +82,7 @@ public class AuthController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
+            /*StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             String stackTrace = sw.toString();
@@ -98,7 +98,13 @@ public class AuthController {
                     "stackTrace", stackTrace
             );
 
-            return ResponseEntity.status(500).body(errorResponse);
+            return ResponseEntity.status(500).body(errorResponse);*/
+
+            //logger.error("Exception during token verification or DB access", e);
+
+            return ResponseEntity.status(500).body(Map.of(
+                    "error", "Internal server error"
+            ));
         }
     }
 }
