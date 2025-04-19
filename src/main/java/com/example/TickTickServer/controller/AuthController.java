@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -80,9 +82,23 @@ public class AuthController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTrace = sw.toString();
+
             System.out.println("🔥 Exception during token verification or DB access:");
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Internal error");
+            System.out.println(stackTrace);
+
+            // Trả chi tiết lỗi (chỉ nên dùng trong môi trường phát triển)
+            Map<String, Object> errorResponse = Map.of(
+                    "error", "Internal error during token verification",
+                    "exception", e.getClass().getName(),
+                    "message", e.getMessage(),
+                    "stackTrace", stackTrace
+            );
+
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
 }
