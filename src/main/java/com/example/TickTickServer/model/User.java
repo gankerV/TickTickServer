@@ -17,6 +17,9 @@ public class User {
 
     private boolean is_premium;
 
+    @Column(name = "premium_expiration_date")
+    private String premium_expiration_date; // Dùng String để khớp với định dạng SQLite
+
     // Getters & Setters
 
     public Long getId() {
@@ -49,5 +52,13 @@ public class User {
 
     public void setIs_premium(boolean is_premium) {
         this.is_premium = is_premium;
+    }
+
+    public String getPremium_expiration_date() {
+        return premium_expiration_date;
+    }
+
+    public void setPremium_expiration_date(String premium_expiration_date) {
+        this.premium_expiration_date = premium_expiration_date;
     }
 }

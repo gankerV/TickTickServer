@@ -22,49 +22,48 @@ public class PremiumController {
 
     @PostMapping("/upgrade")
     public ResponseEntity<?> upgradePremium(@RequestBody UserUpgradeRequest request) {
-        // Lấy thông tin user từ userId
-        Optional<User> userOptional = userService.getUserById(request.getUserId()); // Lấy user theo userId
+        // Lấy user theo email (do app gửi email)
+        Optional<User> userOptional = userService.getUserByEmail(request.getEmail());
 
         if (!userOptional.isPresent()) {
-            System.out.println("User not found with id: " + request.getUserId()); // Log khi không tìm thấy user
+            System.out.println("User not found with email: " + request.getEmail());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
         User user = userOptional.get();
-        System.out.println("Found user: " + user.getEmail()); // Log khi tìm thấy user
+        System.out.println("Found user: " + user.getEmail());
 
-        // Kiểm tra nếu user đã có Premium
+        // Nếu đã premium thì trả về expirationDate hiện tại
         if (user.isIs_premium()) {
-            // Nếu đã premium, trả về thông báo gia hạn thay vì nâng cấp
-            System.out.println("User " + user.getEmail() + " already has premium"); // Log nếu đã có premium
-            return ResponseEntity.ok("User already has premium");
+            System.out.println("User " + user.getEmail() + " already has premium");
+            return ResponseEntity.ok(new PremiumResponse(true, user.getPremium_expiration_date()));
         }
 
-        // Cập nhật thông tin premium cho user
         user.setIs_premium(true);
-        System.out.println("User " + user.getEmail() + " has been upgraded to premium"); // Log khi nâng cấp
+        String expirationDate = "2099-12-31"; // Hoặc bất kỳ ngày hết hạn "vĩnh viễn"
+        user.setPremium_expiration_date(expirationDate);
 
-        // Lưu lại thay đổi
         try {
             userService.save(user);
-            System.out.println("User " + user.getEmail() + " has been successfully saved with premium status"); // Log sau khi lưu
+            System.out.println("User " + user.getEmail() + " upgraded to premium");
         } catch (Exception e) {
-            System.out.println("Error saving user: " + e.getMessage()); // Log lỗi nếu có khi lưu
+            System.out.println("Error saving user: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving user");
         }
 
-        return ResponseEntity.ok(new PremiumResponse(true));
+        return ResponseEntity.ok(new PremiumResponse(true, expirationDate));
     }
 
-    // Dùng để phản hồi từ server khi nâng cấp thành công
+    // Phản hồi gồm success và expirationDate
     public static class PremiumResponse {
         private boolean success;
+        private String expirationDate;
 
-        public PremiumResponse(boolean success) {
+        public PremiumResponse(boolean success, String expirationDate) {
             this.success = success;
+            this.expirationDate = expirationDate;
         }
 
-        // Getters and setters
         public boolean isSuccess() {
             return success;
         }
@@ -72,19 +71,26 @@ public class PremiumController {
         public void setSuccess(boolean success) {
             this.success = success;
         }
-    }
 
-    public static class UserUpgradeRequest {
-        private Long userId; // Hoặc String email
-
-        // Getters and setters
-        public Long getUserId() {
-            return userId;
+        public String getExpirationDate() {
+            return expirationDate;
         }
 
-        public void setUserId(Long userId) {
-            this.userId = userId;
+        public void setExpirationDate(String expirationDate) {
+            this.expirationDate = expirationDate;
+        }
+    }
+
+    // DTO request: Gửi email từ app
+    public static class UserUpgradeRequest {
+        private String email;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
         }
     }
 }
-
