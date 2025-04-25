@@ -22,11 +22,11 @@ public class PremiumController {
 
     @PostMapping("/upgrade")
     public ResponseEntity<?> upgradePremium(@RequestBody UserUpgradeRequest request) {
-        // Lấy thông tin user từ email
-        Optional<User> userOptional = userService.getUserByEmail(request.getEmail());
+        // Lấy thông tin user từ userId
+        Optional<User> userOptional = userService.getUserById(request.getUserId()); // Lấy user theo userId
 
         if (!userOptional.isPresent()) {
-            System.out.println("User not found with email: " + request.getEmail()); // Log khi không tìm thấy user
+            System.out.println("User not found with id: " + request.getUserId()); // Log khi không tìm thấy user
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
@@ -74,17 +74,16 @@ public class PremiumController {
         }
     }
 
-    // DTO request body (UserUpgradeRequest) để lấy email từ client
     public static class UserUpgradeRequest {
-        private String email;
+        private Long userId; // Hoặc String email
 
         // Getters and setters
-        public String getEmail() {
-            return email;
+        public Long getUserId() {
+            return userId;
         }
 
-        public void setEmail(String email) {
-            this.email = email;
+        public void setUserId(Long userId) {
+            this.userId = userId;
         }
     }
 }

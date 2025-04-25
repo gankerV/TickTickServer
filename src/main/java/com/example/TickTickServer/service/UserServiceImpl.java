@@ -14,7 +14,6 @@ public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
 
-
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -22,6 +21,11 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
     }
 
     @Override
