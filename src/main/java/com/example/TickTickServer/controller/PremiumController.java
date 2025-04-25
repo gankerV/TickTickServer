@@ -26,22 +26,32 @@ public class PremiumController {
         Optional<User> userOptional = userService.getUserByEmail(request.getEmail());
 
         if (!userOptional.isPresent()) {
+            System.out.println("User not found with email: " + request.getEmail()); // Log khi không tìm thấy user
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
         User user = userOptional.get();
+        System.out.println("Found user: " + user.getEmail()); // Log khi tìm thấy user
 
         // Kiểm tra nếu user đã có Premium
         if (user.isIs_premium()) {
             // Nếu đã premium, trả về thông báo gia hạn thay vì nâng cấp
+            System.out.println("User " + user.getEmail() + " already has premium"); // Log nếu đã có premium
             return ResponseEntity.ok("User already has premium");
         }
 
         // Cập nhật thông tin premium cho user
         user.setIs_premium(true);
+        System.out.println("User " + user.getEmail() + " has been upgraded to premium"); // Log khi nâng cấp
 
         // Lưu lại thay đổi
-        userService.save(user);
+        try {
+            userService.save(user);
+            System.out.println("User " + user.getEmail() + " has been successfully saved with premium status"); // Log sau khi lưu
+        } catch (Exception e) {
+            System.out.println("Error saving user: " + e.getMessage()); // Log lỗi nếu có khi lưu
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving user");
+        }
 
         return ResponseEntity.ok(new PremiumResponse(true));
     }
@@ -78,3 +88,4 @@ public class PremiumController {
         }
     }
 }
+
